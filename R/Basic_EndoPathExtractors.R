@@ -260,7 +260,148 @@ HistolTypeAndSite<-function(inputString1,inputString2,procedureString){
   return(output)
 }
 
+#' Primary Diagnosis from Endoscopy
+#'
+#' This function extracts the primary diagnosis from the endoscopy free text. It will also add
+#' pathology diagnosis to the final primary code
+#' 
+#'
+#' @param dataframe the dataframe
+#' @param Procedure the Procedure column
+#' @param PathSite the PathSite column
+#' @param FINDINGS the FINDINGS column
+#' @param ENDOSCOPICDIAGNOSIS the ENDOSCOPICDIAGNOSIS column
+#' @param EndoscopyEvent the EndoscopyEvent column
+#' @keywords OPCS-4 codes extraction
+#' @importFrom dplyr mutate case_when
+#' @importFrom rlang sym
+#' @importFrom stringr str_detect
+#' @importFrom stringi stri_split_lines
+#' @export
+#' @examples # Need to run the HistolTypeSite and EndoscopyEvent functions first here
+#' # SelfOGD_Dunn$OPCS4w<-ExtrapolateOPCS4Prep(SelfOGD_Dunn,"PROCEDUREPERFORMED",
+#' # "PathSite","EndoscopyEvent")
 
+dev_ExtrapolateEndoscopicICD10 <- function(dataframe, Procedure,PathSite,FINDINGS,ENDOSCOPICDIAGNOSIS,EndoscopyEvent) { 
+  
+  
+  #Just get the uppers for now:
+  dataframe<-SelfOGD_Dunn[grepl("Gastroscopy",dataframe$Procedure),]
+  
+  #Merge the findings in with the myDx:
+  dataframe$FINDINGSmyDx<-paste(dataframe$FINDINGS,dataframe$ENDOSCOPICDIAGNOSIS)
+  
+  #Split into a string
+  dataframe$FINDINGSmyDx<-stri_split_lines(dataframe$FINDINGSmyDx,omit_empty = TRUE)
+  
+  #Copy over to a new column to be sampled
+  dataframe$FindingsAfterProcessing<-dataframe$FINDINGSmyDx
+  
+  
+  #Use case when on nested list to generate ICD-10 codes and then remove from the list.
+  
+  #If it matches the grep then add the diagnosis, and then chop into list and remove that string
+  
+  
+  dataframe<-dataframe %>%
+    mutate(
+      PrimaryDiagnosisCode = map(
+        FINDINGSmyDx, ~ case_when(
+          grepl("mitotic|emr|tumour", unlist(tolower(.x)),ignore.case=TRUE) ~ "C159  -  Malignant neoplasm oesophagus, unspecified - Oesophagus - unspecified",
+          grepl("dysplasia", unlist(tolower(.x)),ignore.case=TRUE) ~ "K229  -  Disease of oesophagus - unspecified",
+          grepl("stricture", unlist(tolower(.x)),ignore.case=TRUE) ~  "K222  -  Oesophageal obstruction",
+          grepl("barrett", unlist(tolower(.x)),ignore.case=TRUE) ~  "K227  -  Barrett's oesophagus",
+          grepl("(\\.|^)(?=[^\\.]*inlet)(?=[^\\.]*patch)[^\\.]*(\\.|$)", unlist(tolower(.x)),ignore.case=TRUE,perl=TRUE) ~  "K228  -  Other specified diseases of oesophagus",
+          grepl("hiatus",tolower(.x), unlist(tolower(.x)),ignore.case=TRUE,perl=TRUE) ~  "K449  -  Diaphragmatic hernia without obstruction or gangrene",
+          grepl("oesophagitis",tolower(.x), unlist(tolower(.x)),ignore.case=TRUE,perl=TRUE) ~  "K20  -  Oesophagitis",
+          grepl("(?=[^\\.]*(duodenal))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)", unlist(tolower(.x)),ignore.case=TRUE,perl=TRUE) ~  "K26  -  Duodenal ulcer",
+          grepl("(?=[^\\.]*(oesophageal))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)", unlist(tolower(.x)),ignore.case=TRUE,perl=TRUE) ~  "K221  -  Oesophageal ulcer",
+          grepl("(?=[^\\.]*(gastric|stomach|pylor))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)", unlist(tolower(.x)),ignore.case=TRUE,perl=TRUE) ~  "K25  -  Gastric ulcer",
+          TRUE ~ "")
+      )
+    )
+  
+  dataframe$FINDINGSmyDx<-lapply(dataframe$FINDINGSmyDx, function(x) x[!grepl("OESOPH.*","", x,ignore.case=TRUE,perl=TRUE)])
+  
+  dataframe<-dataframe %>%  FindingsAfterProcessing = map(
+    FindingsAfterProcessing, ~ .x[!grepl("(mitotic|emr)", tolower(.x),ignore.case=TRUE,perl=TRUE)]
+  )
+  
+  
+  
+  
+  ######### Go through it again for the second codes:
+  
+  dataframe<-dataframe %>%
+    mutate(
+      OverallDiagnosisCode = map(
+        FindingsAfterProcessing, ~ case_when(
+          grepl("mitotic|emr|tumour", tolower(.x)) ~ "C159  -  Malignant neoplasm oesophagus, unspecified - Oesophagus - unspecified",
+          grepl("dysplasia", tolower(.x)) ~ "K229  -  Disease of oesophagus - unspecified",
+          grepl("stricture",tolower(.x),ignore.case=TRUE) ~  "K222  -  Oesophageal obstruction",
+          grepl("barrett",tolower(.x),ignore.case=TRUE) ~  "K227  -  Barrett's oesophagus",
+          grepl("(\\.|^)(?=[^\\.]*inlet)(?=[^\\.]*patch)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K228  -  Other specified diseases of oesophagus",
+          grepl("hiatus",tolower(.x),ignore.case=TRUE) ~  "K449  -  Diaphragmatic hernia without obstruction or gangrene",
+          grepl("oesophagitis",tolower(.x),ignore.case=TRUE) ~  "K20  -  Oesophagitis",
+          grepl("(?=[^\\.]*(duodenal))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K26  -  Duodenal ulcer",
+          grepl("(?=[^\\.]*(oesophageal|oesophagus))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K221  -  Oesophageal ulcer",
+          grepl("(?=[^\\.]*(gastric|stomach|pylor))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K25  -  Gastric ulcer",
+          grepl("gastritis",tolower(.x),ignore.case=TRUE) ~  "K297  -  Gastritis - unspecified",
+          grepl("duodenitis",tolower(.x),ignore.case=TRUE) ~  "K298  -  Duodenitis",
+          grepl("(?=[^\\.]*(gastric))(?=[^\\.]*polyp)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K317  -  Polyp of stomach and duodenum",
+          grepl("candid",tolower(.x),ignore.case=TRUE) ~  "B387  -  Candidiasis of other sites",
+          TRUE ~ "")
+      ),
+      FindingsAfterProcessing = map(
+        FindingsAfterProcessing, ~ .x[!grepl("(mitotic|emr|tumour|dysplasia|hiatus|stricture|barrett|inlet patch|
+                                             hiatus|esophagitis|duodenitis|gastritis)|(?:(?=[^\\.]*(duodenum|oesophagus|gastric|stomach|pylor))(?=[^\\.]*ulcer)[^\\.]*(\\.|$))|
+                                             (?:(?=[^\\.]*(stomach))(?=[^\\.]*polyp)[^\\.]*(\\.|$))|(candid)", tolower(.x),ignore.case=TRUE,perl=TRUE)]
+      )
+        )
+  
+  
+  dataframe$OverallDiagnosisCode<-lapply(dataframe$OverallDiagnosisCode,function(x) (unique(x)))
+  dataframe$OverallDiagnosisCode<-lapply(dataframe$OverallDiagnosisCode, function(x) x[x != "" & x != "\n"])
+  
+  
+  #Now go through the OverallCodes and determine the 
+  
+  
+  ######### Go through it again for the third codes: 
+  
+  dataframe<-dataframe %>%
+    mutate(
+      ThirdDiagnosisCode = map(
+        FindingsAfterProcessing, ~ case_when(
+          grepl("mitotic|emr|tumour", tolower(.x)) ~ "C159  -  Malignant neoplasm oesophagus, unspecified - Oesophagus - unspecified",
+          grepl("dysplasia", tolower(.x)) ~ "K229  -  Disease of oesophagus - unspecified",
+          grepl("stricture",tolower(.x),ignore.case=TRUE) ~  "K222  -  Oesophageal obstruction",
+          grepl("barrett",tolower(.x),ignore.case=TRUE) ~  "K227  -  Barrett's oesophagus",
+          grepl("(\\.|^)(?=[^\\.]*inlet)(?=[^\\.]*patch)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K228  -  Other specified diseases of oesophagus",
+          grepl("hiatus",tolower(.x),ignore.case=TRUE) ~  "K449  -  Diaphragmatic hernia without obstruction or gangrene",
+          grepl("oesophagitis",tolower(.x),ignore.case=TRUE) ~  "K20  -  Oesophagitis",
+          grepl("(?=[^\\.]*(duodenal))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K26  -  Duodenal ulcer",
+          grepl("(?=[^\\.]*(oesophageal|oesophagus))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K221  -  Oesophageal ulcer",
+          grepl("(?=[^\\.]*(gastric|stomach|pylor))(?=[^\\.]*ulcer)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K25  -  Gastric ulcer",
+          grepl("gastritis",tolower(.x),ignore.case=TRUE) ~  "K297  -  Gastritis - unspecified",
+          grepl("duodenitis",tolower(.x),ignore.case=TRUE) ~  "K298  -  Duodenitis",
+          grepl("(?=[^\\.]*(gastric))(?=[^\\.]*polyp)[^\\.]*(\\.|$)",tolower(.x),ignore.case=TRUE,perl=TRUE) ~  "K317  -  Polyp of stomach and duodenum",
+          grepl("candid",tolower(.x),ignore.case=TRUE) ~  "B387  -  Candidiasis of other sites",
+          TRUE ~ "")
+      ),
+      FindingsAfterProcessing = map(
+        FindingsAfterProcessing, ~ .x[!grepl("(mitotic|emr|tumour|dysplasia|hiatus|stricture|barrett|inlet patch|
+                                             hiatus|esophagitis|duodenitis|gastritis)|(?:(?=[^\\.]*(duodenum|oesophagus|gastric|stomach|pylor))(?=[^\\.]*ulcer)[^\\.]*(\\.|$))|
+                                             (?:(?=[^\\.]*(gastric))(?=[^\\.]*polyp)[^\\.]*(\\.|$))|(candid)", tolower(.x),ignore.case=TRUE,perl=TRUE)]
+      )
+    )
+  
+  #To Do: Also assess the findings column
+  
+  
+  
+  return(primDxVector)
+}
 
 
 

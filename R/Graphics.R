@@ -160,7 +160,8 @@ scale_colour_Publication <- function(...){
 
 
 
-#' #' Determine the patient metric of choice over time WORK IN PROGRESS
+#' #' Determine the patient metric of choice over time WORK IN PROGRESS.
+#' Needs to be finished.
 #' #'
 #' #' This function aims to show what is happening over time to a metric
 #' #' of choice on a per patient basis.

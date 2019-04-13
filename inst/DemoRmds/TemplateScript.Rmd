@@ -1,5 +1,5 @@
 ---
-title: "Template Script"
+title: "Template Script for GRS reports"
 author: "Sebastian Zeki"
 date: "20/11/2018"
 output: html_document

@@ -38,7 +38,7 @@ Gastroenterology now has many standards against which practice is measured altho
 <br>
 
 ```{r fig.width=8, fig.height=8,fig.align='center',out.width = "50%",echo=FALSE}
-knitr::include_graphics("img/EndoMineRBasic.png")
+knitr::include_graphics("img/EndoMineRBasic.jpg")
 ```
 
 
@@ -72,10 +72,6 @@ The Extractor (or Extractor2) is a very useful function. Different hospitals wil
 A list of keywords is then constructed. This list is made up of the words that will be used to split the document. It is very common for individual departments in both gastroenterology and pathology to use semi-structured reporting so that the same headers are used between patient reports. The list is therefore populated with these headers as defined by the user. The Extractor then does the splitting for each pair of words, dumps the text between the delimiter in a new column and names that column with the first keyword in the pair with some cleaning up and then returns the new dataframe. 
 
 
-<br>
-```{r fig.width=12, fig.height=8,fig.align='center',echo=FALSE}
-knitr::include_graphics("img/EndoMineR_Extractor.svg")
-```
 
 
 
@@ -186,8 +182,8 @@ TheOGDReportFinal2<-Extractor(TheOGDReportFinal$OGDReportWhole,mywords)
 
 
 ```{r exampleEndoCleaningFuncMed, echo = TRUE}
-cbind(EndoscMeds(Myendo$Medications), Myendo)
-pander(head(cbind(EndoscMeds(Myendo$Medications), Myendo)[1:4],5))
+#cbind(EndoscMeds(Myendo$Medications), Myendo)
+#pander(head(cbind(EndoscMeds(Myendo$Medications), Myendo)[1:4],5))
 
 ```
 

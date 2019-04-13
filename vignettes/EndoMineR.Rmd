@@ -38,7 +38,7 @@ Gastroenterology now has many standards against which practice is measured altho
 <br>
 
 ```{r fig.width=8, fig.height=8,fig.align='center',out.width = "50%",echo=FALSE}
-knitr::include_graphics("img/EndoMineROverView.png")
+knitr::include_graphics("img/EndoMineRBasic.png")
 ```
 
 
@@ -214,21 +214,21 @@ Based on this, the word that limits the number you are interested in is 'specime
 <br>
 
 ```{r exampleHistolNumbOfBx2, echo = TRUE}
-Mypath$NumbOfBx<-HistolNumbOfBx(Mypath$Macroscopicdescription,'specimen')
+#Mypath$NumbOfBx<-HistolNumbOfBx(Mypath$Macroscopicdescription,'specimen')
 ```
 
 ```{r exampleHistolNumbOfBx3, echo = FALSE}
-sh<-data.frame(Mypath$HospitalNumber,Mypath$PatientName,Mypath$NumbOfBx)
-pander(head(sh,5))
+#sh<-data.frame(Mypath$HospitalNumber,Mypath$PatientName,Mypath$NumbOfBx)
+#pander(head(sh,5))
 ```
 
 
 We might also be interested in the size of the biopsy taken. A further function called **HistolBxSize** is provided for this. This is also derived from the macroscopic description of the specimen
 
 ```{r exampleHistolBxSize1, echo = FALSE}
-Mypath$BxSize<-HistolBxSize(Mypath$Macroscopicdescription)
-sh<-data.frame(Mypath$HospitalNumber,Mypath$PatientName,Mypath$BxSize)
-pander(head(sh,5))
+#Mypath$BxSize<-HistolBxSize(Mypath$Macroscopicdescription)
+#sh<-data.frame(Mypath$HospitalNumber,Mypath$PatientName,Mypath$BxSize)
+#pander(head(sh,5))
 ```
 
 A final function is also provided called **HistolTypeAndSite**. This is particularly useful when trying to find out which biopsies came from which site. 

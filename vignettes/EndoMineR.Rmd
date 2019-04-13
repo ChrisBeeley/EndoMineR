@@ -115,7 +115,7 @@ If you wish, further cleaning functions are provided to get clean the Endoscopis
 
 
 
-## 2. Data linkage
+## 2. ** Data linkage**
 
 Endoscopy data may be linked with other types of data. The most common associated dataset is pathology data from biopsies etc taken at endoscopy. This pathology data should be processed in exactly the same way as the endoscopy data- namely with textPrep (with or without EndoPaste). 
 
@@ -125,7 +125,7 @@ The resulting pathology dataset should then be merged with the endoscopy dataset
 v<-Endomerge2(Myendo,'Dateofprocedure','HospitalNumber',Mypath,'Dateofprocedure','HospitalNumber')
 ```
 
-## 3. Deriving new data from what you have
+## 3. **Deriving new data from what you have**
 
 Once the text has been separated in to the columns of your choosing you are ready to see what we can extract. Functions are provided to allow quite complex extractions at both a general level and also for specific diseases.
 
@@ -210,25 +210,32 @@ Based on this, the word that limits the number you are interested in is 'specime
 <br>
 
 ```{r exampleHistolNumbOfBx2, echo = TRUE}
-#Mypath$NumbOfBx<-HistolNumbOfBx(Mypath$Macroscopicdescription,'specimen')
+Mypath$NumbOfBx<-HistolNumbOfBx(Mypath$Macroscopicdescription,'specimen')
 ```
 
 ```{r exampleHistolNumbOfBx3, echo = FALSE}
-#sh<-data.frame(Mypath$HospitalNumber,Mypath$PatientName,Mypath$NumbOfBx)
-#pander(head(sh,5))
+sh<-data.frame(Mypath$HospitalNumber,Mypath$PatientName,Mypath$NumbOfBx)
+pander(head(sh,5))
 ```
 
 
-We might also be interested in the size of the biopsy taken. A further function called **HistolBxSize** is provided for this. This is also derived from the macroscopic description of the specimen
+We might also be interested in the size of the biopsy taken. A further function called **HistolBxSize** is provided for this. This is also derived from the macroscopic description of the specimen.
+
 
 ```{r exampleHistolBxSize1, echo = FALSE}
-#Mypath$BxSize<-HistolBxSize(Mypath$Macroscopicdescription)
-#sh<-data.frame(Mypath$HospitalNumber,Mypath$PatientName,Mypath$BxSize)
-#pander(head(sh,5))
+Mypath$BxSize<-HistolBxSize(Mypath$Macroscopicdescription)
+sh<-data.frame(Mypath$HospitalNumber,Mypath$PatientName,Mypath$BxSize)
+pander(head(sh,5))
 ```
 
 A final function is also provided called **HistolTypeAndSite**. This is particularly useful when trying to find out which biopsies came from which site. 
 
 The output is provided as a site:specimen type pair. An alternative output is also provided which groups locations (eg the gastro-oesophageal junction is seen as part of the oesophagus). 
+Of course, the data disualisation part of this package (templated to produce publication ready graphs amongst other things) can be used with this data in one line as follows:
+```{r exampleHistolTypeAndSite, echo = FALSE}
 
+Myendo2<-Endomerge2(Myendo,'Dateofprocedure','HospitalNumber',Mypath,'Dateofprocedure','HospitalNumber')
+PathSiteAndType <- HistolTypeAndSite(Myendo2$PathReportWhole,Myendo2$Macroscopicdescription, Myendo2$ProcedurePerformed)
+pander(head(data.frame(PathSiteAndType),5))
 
+```

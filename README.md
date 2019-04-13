@@ -1,17 +1,9 @@
 
-[![Build Status](https://travis-ci.org/ropensci/EndoMineR.svg?branch=master)](https://travis-ci.org/ropensci/EndoMineR) [![ropensci](https://badges.ropensci.org/153_status.svg)](https://github.com/ropensci/onboarding/issues/153) [![Coverage status](https://codecov.io/gh/ropensci/EndoMineR/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/EndoMineR?branch=master)
-[![DOI](http://joss.theoj.org/papers/10.21105/joss.00701/status.svg)](https://doi.org/10.21105/joss.00701)
+[![Build Status](https://travis-ci.org/sebastiz/EndoMineR.svg?branch=master)](https://travis-ci.org/sebastiz/EndoMineR) [![ropensci](https://badges.ropensci.org/153_status.svg)](https://github.com/ropensci/onboarding/issues/153) [![Coverage status](https://codecov.io/gh/sebastiz/EndoMineR/branch/master/graph/badge.svg)](https://codecov.io/github/sebastiz/EndoMineR?branch=master)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<img src="vignettes/img/EndoMineRLogo.png" style="display: block; margin: auto;" />
-
 EndoMineR
 =========
-
-The fuller explanation can be found [here](https://ropensci.github.io/EndoMineR/). 
-
-EndoMineR has undergone a significant revision in order to make it more streamlined
-
 
 The goal of EndoMineR is to extract as much information as possible from endoscopy reports and their associated pathology specimens. The package is intended for use by gastroenterologists, pathologists and anyone interested in the analysis of endoscopic and ppathological datasets
 
@@ -38,7 +30,22 @@ You can install EndoMineR from github with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("ropensci/EndoMineR")
+devtools::install_github("sebastiz/EndoMineR")
+```
+
+If you dont have access to github, then download the zip and change the working dirctory to the place you have downloaded it, then do
+
+``` r
+setwd("C:/Users/Desktop/")
+
+#On windows you cand cd to change the directory or us pushd to create a temporary directory indtead of cd and then setwd to the temporary directory
+unzip("EndoMineR.zip")
+file.rename("EndoMineR.zip-master", "EndoMineR.zip")
+shell("R CMD build EndoMineR.zip")
+
+#Then install the resulting tarball with:
+
+install.packages("EndoMineR_0.2.0.9000.tar.gz", repos = NULL)
 ```
 
 Getting started
@@ -48,48 +55,42 @@ Getting started
 
 **The data input**
 
-Most datasets will either be raw text so that the entire report contents is one text file. Other datasets will be spreadsheets where the pertinent columns reflecting eg Medication, performing endoscopis etc., will already be separated out. Functions are available for both situations. If the input is a series of raw text files organised as a series of rows (one row per report), then the first function to use, once the data has been inputted, is the extractor function
+As long as your data has been inputted, the package should be pretty easy to use. It really is designed to use whole text reports, but if you have data already in columns that is not a problem. Before you use the main function you just have to process your spreadsheet with EndoPaste and go from there...
 
-### The extractor function
+Here is an example data set which is loaded with the package. There are several. We will use the TheOGDReportFinal dataset which is a dataframe of (synthetically created) endoscopy reports
 
-One of the most useful functions in the package is the Extractor. Different hospitals will use different software with different headings for endoscopic reports. The extractor allows the user to define the separations in a report so that all reports can be automatically placed into a meaningful dataframe for further cleaning. This is analogous to tokenization in natural language processing. Here we use the in built datasets as part of the package:
+<table style="width:44%;">
+<colgroup>
+<col width="44%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">OGDReportWhole</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Hospital: Random NHS Foundation Trust Hospital Number: J6044658 Patient Name: Jargon, Victoria General Practitioner: Dr. Martin, Marche Date of procedure: 2009-11-11 Endoscopist: Dr. Sullivan, Shelby 2nd Endoscopist: Dr. al-Basha, Mahfoodha Medications: Fentanyl 12.5mcg Midazolam 6mg Instrument: FG5 Extent of Exam: GOJ Indications: Follow-up ULCER HEALING Procedure Performed: Gastroscopy (OGD) Findings: No evidence of Barrett's oesophagus, short 2 cn hiatus hernia.,Oesophageal biopsies taken from three levels as requested.,OGD today to assess for ulceration/ongoing bleeding.,Diaphragmatic pinch:40cm .,She has a small hiatus hernia .,We will re-book for 2 weeks, rebanding.,Tiny erosions at the antrum.,Biopsies taken from top of stricture-metal marking clips in situ.,The varices flattened well with air insufflation.,He is on Barrett's Screeling List in October 2017 at St Thomas'. HALO 90 done with good effect Endoscopic Diagnosis: Post chemo-radiotherapy stricture</td>
+</tr>
+</tbody>
+</table>
+
+Assuming you have whole reports you need to enter the subtitles that delineate the sections of your text, and then run the textPrep function.
 
 ``` r
 mywords<-c("Hospital Number","Patient Name:","DOB:","General Practitioner:",
-"Date received:","Clinical Details:","Macroscopic description:",
-"Histology:","Diagnosis:")
-Mypath<-Extractor(Mypath,"PathReportWhole",mywords)
+ "Date received:","Clinical Details:","Macroscopic description:",
+ "Histology:","Diagnosis:")
+textPrep(PathDataFrameFinal$PathReportWhole,mywords,NegEx="TRUE",Extractor="1")
 ```
 
-<br>
+The parameters indicate whether you want to get rid of Negative phrases from your text \`\`\`\` and which Extractor you want to use (1 means you know the subtitles are always in the same order, 2 means they are sometimes missing) <br>
 
 This function should be used for both histology and pathology datasets separately.
 
-<br>
-
-### The cleaning function
-
-<br>
-
-Individual cleaning functions are provided for individual columns (for the most likely columns that you might want to analyse- eg Medications, Endoscopist, the Procedure performed etc.). For histopathology similar cleaning functions can be found.
-
-For example, when cleaning the endoscopist name the following function can be used:
-
-``` r
-EndoscEndoscopist(Myendo,'Endoscopist')
-```
-
-Many such functions for both endoscopy and histology are provided
-
-<br>
-
-Both endoscopy and histology functions can also be found as part of a respective convenience parent function (for endoscopy it is called EndoscAll and for histology it is called HistolAll).
-
-<br>
-
 ### The merging function
 
-Once the histology and endoscopy datasets have been cleaned, if you wish (and want to run some of the analysis functions later in the packaed) you can merge the endoscopy and pathology datasets. This has been provided as a convenience function EndoMerge2 and merges the datasets based on the date performed (with some flexibility given pathology received is not always the same as the endoscopy date).
+Once the histology and endoscopy datasets have been cleaned, if you wish (and want to run some of the analysis functions later in the package) you can merge the endoscopy and pathology datasets. This has been provided as a convenience function EndoMerge2 and merges the datasets based on the date performed (with some flexibility given pathology received is not always the same as the endoscopy date).
 
 ``` r
 v<-Endomerge2(Myendo,'Dateofprocedure','HospitalNumber',Mypath,'Dateofprocedure','HospitalNumber')
@@ -100,19 +101,33 @@ v<-Endomerge2(Myendo,'Dateofprocedure','HospitalNumber',Mypath,'Dateofprocedure'
 The overall aim is to provide functions that allow the user to perform complex analyses on the endoscopic-pathological datasets. As far as possible the analyses are based on guidelines developed by the British Society of Gastroenterology. These analyses will expand in further iterations. Generic analyses functions are provided for example, as various numeric analyses plotted by endoscopist.
 
 ``` r
-Myendo<-EndoscMeds(Myendo,'Medications')
-Fent<-MetricByEndoscopist(Myendo,'Endoscopist','Fent')
+library(EndoMineR)
+MyendoNew<-cbind(EndoscMeds(Myendo$Medications),Myendo)
+# Now lets look at the fentanly use per Endoscopist:
+FentByEndo<-MetricByEndoscopist(MyendoNew,'Endoscopist','Fent')
+
+#Now lets plot it with the publication ready plotter function EndoBasicGraph:
+
+EndoBasicGraph(FentByEndo, "Endoscopist", "avg")
+#> Warning: `legend.margin` must be specified using `margin()`. For the old
+#> behavior use legend.spacing
 ```
+
+![](README-exampleAnalyses-1.png)
 
 More specific analyses, ie those relating to a specific guidelines are also provided. For example in the case of Barrett's oesophagus, the follow-up timing for the next endoscopy in those who have non dysplastic mucosa, can be determined as follows:
 
 ``` r
 v<-Endomerge2(Myendo,"Dateofprocedure","HospitalNumber",Mypath,"Dateofprocedure","HospitalNumber")
-b<-Barretts_PathStage(v,'Histology')
-b2<-Barretts_Event(b,'Histology','ProcedurePerformed','OGDReportWhole','Findings') b3<-Barretts_FUGroup(b2,'Findings')
+
+#Just grab the Barretts surveillance gastroscopies
+v<-v[grepl("[SS]urv",v$Indications),]
+b<-Barretts_PragueScore(v, "Findings", "OGDReportWhole")
+b$IMorNoIM<-Barretts_PathStage(b,'Histology')
+b3$FUType<-Barretts_FUType(b, "CStage", "MStage", "IMorNoIM")
 ```
 
-Further more detailed examples are provided in the associated vignette for this package
+Further more detailed examples are provided in the associated vignette for this package.
 
 ### How to contribute
 
@@ -126,13 +141,10 @@ Follow the normal process of forking the project, and setup a new branch to work
 
 The best way to ensure your code is properly formatted is to use lint. Various packages in R provide this.
 
-Any significant changes should almost always be accompanied by tests. The project already has good test coverage, so look at some of the existing tests if you're unsure how to go about it. 
+Any significant changes should almost always be accompanied by tests. The project already has good test coverage, so look at some of the existing tests if you're unsure how to go about it.
 
 Do your best to have well-formed commit messages for each change. This provides consistency throughout the project, and ensures that commit messages are able to be formatted properly by various git tools.
 
 Finally, push the commits to your fork and submit a pull request. Please, remember to rebase properly in order to maintain a clean, linear git history.
 
-
 [![ropensci\_footer](https://ropensci.org/public_images/ropensci_footer.png)](https://ropensci.org)
-
-

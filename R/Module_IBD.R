@@ -10,7 +10,7 @@
 # 
 # EXAMPLE DATASET NEEDED
 # 2.    ·         General description of previous disease extent (anywhere on the report) – NEED EXAMPLE DATASET
-# 10.    ·         Overall impression/summary of findings is provided NEED EXAMPLE DATASET
+# 10.   ·         Overall impression/summary of findings is provided NEED EXAMPLE DATASET
 # 4.    ·         Specific IBD therapy at the time of procedure (medication and route (unless obvious) listed but no need for dosage/interval) NEED EXAMPLE DATASET
 # 5.    ·         Description of UC related symptoms at the time of current evaluation included in the report (consider ‘yes’ if any of the following documented: diarrhoea, nocturnal bowel opening, urgency, abdominal pain, PR bleeding, fatigue, extraintestinal features of IBD, or a statement describing their absence e.g. ‘asymptomatic’) NEED EXAMPLE DATASET.... Need symptom list from somewhere...
 # 
@@ -26,3 +26,10 @@
 #   MISSING
 # 13.    ·         Speciality of senior endoscopist: Physician/Surgeon NO DETAILS FROM THIS REPORT
   
+
+######## Functions to create ######
+#Scores
+  #Mayo
+  #UCEIS
+
+#Maximum extent of disease visible endoscopically.

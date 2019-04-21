@@ -717,3 +717,57 @@ WordsToNumbers <- function() {
   return(NumberConv)
 }
 
+
+
+
+#' Words to numbers
+#'
+#' This function converts words to numbers.
+#' @keywords Event extraction
+#' @export
+#' @examples
+#' # unique(unlist(EventList(), use.names = FALSE))
+IBDMeds <- function() {
+  IBDMedsList <- list(
+    "[Aa]da" = "adalimumab",
+    "[Hh]umira" = "adalimumab", 
+    "[Ii]fx" = "infliximab",
+    "[Gg]oli" = "golimumab",
+    "[Uu]ste" = "ustekinumab",
+    "[Ss]telara" = "ustekinumab",
+    "[Vv]edo" = "vedolizumab",
+    "[Ee]tro" = "etrolizumab", 
+    "[Aa]za" = "azathioprine",
+    "[Mm]p" = "mercaptopurine",
+    "[Tt]g" = "thioguanine",
+    "[Ll][Dd][Aa][Aa]" = "combination with allopurinol",
+    "[Mm]tx" = "methotrexate",
+    "[Cc]yclo" = "cyclosporine",
+    "[Cc]iclo" = "ciclosporine",
+    "[Tt]acro" = "tacrolimus",
+    "[Tt]ofa" = "tofacitinib",
+    "[Ss]ulpha" = "sulfasalazine",
+    "[Bb]alsalazide" = "balsalazide",
+    "5[Aa]sa" = "mesalasine", 
+    "[Aa]sacol" = "mesalasine",
+    "[Pp]entasa" = "mesalasine",
+    "[Oo]ctasa" = "mesalasine",
+    "[Ss]alofalk" = "mesalasine",
+    "[Mm]ezavant" = "mesalasine",
+    "[Pp]red" = "prednisolone", 
+    "[Hh]ydrocort" = "hydrocortisone", 
+    "[Bb]udesonide" = "budesonide",
+    "[Ee]ndocort" = "budesonide",
+    "[Cc]ortiment" = "budesonide",
+    "[Bb]udenofalk" = "budesonide",
+    "[Cc]ipro" = "ciprofloxacin",
+    "[Mm]etro" = "metronidazole", 
+    "[Bb]eclomethazone"= "beclomethasone",
+    "[Cc]lipper"= "beclomethasone"
+  )
+  # To get the list as a list of values only in a regex use
+  # paste0(unlist(IBDMedsList,use.names=F),collapse="|")
+  
+  return(IBDMedsList)
+}
+

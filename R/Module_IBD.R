@@ -31,5 +31,34 @@
 #Scores
   #Mayo
   #UCEIS
+  #Rutgerts
+  #SCCAI
+
+
+#' Cleans medication column if present
+#'
+#' This extracts all of the relevant IBD scores where present
+#' from the medical text.
+#' @param inputColumn1 column of interest as a string vector
+#' @keywords IBD scores
+#' @return This returns a dataframe with all the scores in it
+#' @importFrom stringr str_extract str_match
+#' @export
+#' @examples
+#'  df<-read.csv("/Users/sebastianzeki/Documents/AnonKCHendo6m.csv",stringsAsFactors = FALSE)
+#' IBD_Scores(df$ER_FINDINGS_STR)
+#' MydfNew <- cbind(IBD_Scores(df$ER_FINDINGS_STR), df)
+IBD_Scores <- function(inputColumn1) {
+  df <- data.frame(inputColumn1, stringsAsFactors = FALSE)
+  inputColumn1<-tolower(inputColumn1)
+  df$UCEIS<-str_extract(inputColumn1,"uceis.*?(?<![a-z])[0-9]")
+  df$SCCAI<-str_match(inputColumn1,"sccai.*")
+  df$UCEIS<-str_match(inputColumn1,"uceis.*?(?<![a-z])([0-9])")
+  df$Mayo<-str_match(inputColumn1,"mayo.*?(\\d)")
+  df$Rutgerts<-str_match(inputColumn1,"rutg.*?(\\d)")
+}
+
+
+
 
 #Maximum extent of disease visible endoscopically.

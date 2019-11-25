@@ -118,7 +118,6 @@ if (getRversion() >= "2.15.1")
 #' CleanResults<-textPrep(PathDataFrameFinal$PathReportWhole,mywords)
 
 
-
 #Need to make sure the sentences are separated in the Extractor column by a separator such as carriage return
 #So that a tokenizer can be used for NegEx or any other function.
 #Also need to get rid of ASCII \\X10 etc in the Column Cleanup.
